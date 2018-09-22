@@ -5,6 +5,8 @@ const dbPath = 'mongodb://tranhongnhi1993:M7kzEd9YDSNdLeB@ds211143.mlab.com:1114
 mongoose.Promise = global.Promise;
 mongoose.connect(dbPath, { useNewUrlParser: true }).catch(e => {
   console.log('connect to database error', e);
+}).then(() => {
+  console.log('success connect to mlab database');
 });
 
 module.exports = {
