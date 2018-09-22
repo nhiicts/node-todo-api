@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 
-const dbPath = 'mongodb://tranhongnhi1993:M7kzEd9YDSNdLeB8k@ds211143.mlab.com:11143/todos';
+const dbPath = 'mongodb://tranhongnhi1993:M7kzEd9YDSNdLeB@ds211143.mlab.com:11143/todos';
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI || dbPath, { useNewUrlParser: true });
+mongoose.connect(dbPath, { useNewUrlParser: true }).catch(e => {
+  console.log('connect to database error', e);
+});
 
 module.exports = {
   mongoose
