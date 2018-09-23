@@ -48,13 +48,13 @@ app.delete('/todos/:id', (req, res) => {
   // validate the id
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
+    return res.status(404).send('ObjectID is invalid.');
   }
-  Todo.findByIdAndRemove(id).then(result => {
-    if (!result) {
-      res.status(404).send();
+  Todo.findByIdAndDelete(id).then(todo => {
+    if (!todo) {
+      res.status(404).send('Id nout found.');
     }
-    res.send(result);
+    res.send(todo);
   }).catch(e => res.status(404).send(e));
 });
 
