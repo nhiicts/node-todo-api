@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-const dbPath = process.env.PORT ? 'mongodb://tranhongnhi1993:M7kzEd9YDSNdLeB@ds211143.mlab.com:11143/todos' :
- 'mongodb://localhost/TodoApp';
+const dbPath = process.env.MONGODB_URI;
 
 mongoose.Promise = global.Promise;
 mongoose.connect(dbPath, { useNewUrlParser: true }).catch(e => {
