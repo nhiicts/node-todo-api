@@ -10,22 +10,14 @@ const {
 const {
   Todo
 } = require('./../models/todo');
+const {
+  User
+} = require('./../models/user');
 
-const todos = [{
-    _id: new ObjectID(),
-    text: 'First test todo'
-  },
-  {
-    _id: new ObjectID(),
-    text: 'Second test todo'
-  }
-]
+const { populateTodos, todos, users, populateUsers } = require('./seed/seed');
 
-beforeEach((done) => {
-  Todo.deleteMany({}).then(() => {
-    return Todo.insertMany(todos);
-  }).then(() => done()).catch(done);
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 describe('POST /todos', () => {
   it('should create a new todo', (done) => {
@@ -182,5 +174,65 @@ describe('UPDATE /todos/:id', () => {
         expect(res.body.completedAt).toBeNull();
       })
       .end(done);
+  });
+});
+
+describe('GEt /users/me', () => {
+  it('should return user if authenticated', done => {
+    request(app)
+    .get('/users/me')
+    .set('x-auth', users[0].tokens[0].token)
+    .expect(200)
+    .expect(res => {
+      expect(res.body._id).toBe(users[0]._id.toHexString());
+      expect(res.body.email).toBe(users[0].email);
+    })
+    .end(done);
+  });
+
+  it('should return 401 if not authenticated', done => {
+    request(app)
+    .get('/users/me')
+    .set('x-auth', '123abc!!!')
+    .expect(401)
+    .expect(res => {
+      expect(res.body).toEqual({});
+    })
+    .end(done)
+  });
+});
+
+describe('POST /users', () => {
+  it('should create a user', done => {
+    const email = 'example@example.com';
+    const password = '123aaaaa!';
+    request(app)
+    .post('/users')
+    .send({email, password})
+    .expect(200)
+    .expect((res) => {
+      expect(res.body._id).toBeTruthy();
+      expect(res.body.email).toEqual(email);
+      expect(res.header['x-auth']).toBeTruthy();
+    }).end(done);
+  });
+
+  it('should return validation errors if request invalid', done => {
+    request(app)
+    .post('/users')
+    .send({email: 'asad', password: '123'})
+    .expect(400)
+    .end(done)
+  });
+
+  it('should not create user if email is in use', done => {
+    request(app)
+    .post('/users')
+    .send({
+      email: users[0].email,
+      password: '2212121212'
+    })
+    .expect(400)
+    .end(done)
   });
 });
